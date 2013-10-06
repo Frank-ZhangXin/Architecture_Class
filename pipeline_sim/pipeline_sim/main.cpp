@@ -9,32 +9,56 @@
 #include <iostream>
 #include <thread>
 #include <string>
+#include <mutex>
 
 using namespace std;
 
-string Reg = {"R1", "R2"};
+mutex t_lock;
 
-string Stg = {"IF", "ID"};
 
-void call(string str){
-    cout << str << endl;
+
+string stg_IF(){
+    //lock_guard<mutex> lk(t_lock);
+    string str = "This is IF stage.";
+    return str;
 }
 
-void t_i(){
-    call("inst 1");
+string stg_ID(){
+    //lock_guard<mutex> lk(t_lock);
+    string str = "This is ID stage.";
+    return str;
 }
 
-void t_i1(){
-    call("inst 2");
+void inst(){
+    lock_guard<mutex> lk(t_lock);
+    cout << stg_IF() << endl;
+    cout << stg_ID() << endl;
+    
 }
+
 
 int main(int argc, const char * argv[])
 {
-    string inst1 = &Reg[0];
-    thread thrd_1(t_i);
-    thrd_1.join();
-    thread thrd_2(t_i1);
-    thrd_2.join();
+    //thread thrd_1(inst);
+    //thread thrd_2(inst);
+    //thread thrd_3(inst);
+    //thread thrd_4(inst);
+
+    
+    //thrd_1.join();
+    //thrd_2.join();
+    //thrd_3.join();
+    //thrd_4.join();
+    
+    int i = 0;
+    while (true) {
+        thread n(inst);
+        n.join();
+        i++;
+        if (i == 10) {
+            break;
+        }
+    }
     
     return 0;
     
