@@ -10,55 +10,82 @@
 #include <thread>
 #include <string>
 #include <mutex>
-#include <queue>
 #include <stack>
 
 
 using namespace std;
 
-struct bank_account
+struct inst
 {
-    explicit bank_account(string name, string title)
+    explicit inst(string name, string stage)
     {
-        sName = name;
-        mTitle = title;
+        iName = name;
+        iStage = stage;
     }
     
-    string sName;
-    string mTitle;
+    string iName;
+    string iStage;
     mutex mMutex;
 };
 
-void transfer( bank_account &from, bank_account &to)
+stack<string> stg_stk;
+
+void stg_init(stack<string> *stg_stk){
+    stg_stk->push("IF");
+    stg_stk->push("ID");
+    stg_stk->push("EX");
+    stg_stk->push("MEM");
+    stg_stk->push("WB");
+}
+
+
+void transfer( inst &i1, inst &i2, inst &i3, inst &i4, inst &i5)
 {
     // don't actually take the locks yet
-    unique_lock<mutex> lock1( from.mMutex, defer_lock );
-    unique_lock<mutex> lock2( to.mMutex, defer_lock );
+    unique_lock<mutex> lock1( i1.mMutex, defer_lock );
+    unique_lock<mutex> lock2( i2.mMutex, defer_lock );
+    unique_lock<mutex> lock3( i3.mMutex, defer_lock );
+    unique_lock<mutex> lock4( i4.mMutex, defer_lock );
+    unique_lock<mutex> lock5( i5.mMutex, defer_lock );
     
     // lock both unique_locks without deadlock
-    lock( lock1, lock2 );
+    lock( lock1, lock2, lock3, lock4, lock5 );
     
-    string title = from.mTitle;
-    from.mTitle = to.mTitle;
-    to.mTitle = title;
+    stack<string> *ptr = &stg_stk;
+    i1.iStage = ptr->top();
+    ptr->pop();
+    i2.iStage = ptr->top();
+    ptr->pop();
+    i3.iStage = ptr->top();
+    ptr->pop();
+    i4.iStage = ptr->top();
+    ptr->pop();
+    i5.iStage = ptr->top();
+    ptr->pop();
     
     // output log
-    cout << from.sName << "'s stage is " << from.mTitle << endl;
-    cout << to.sName << "'s stage is " << to.mTitle << endl;
+    cout << i1.iName << "'s stage is " << i1.iStage << endl;
+    cout << i2.iName << "'s stage is " << i2.iStage << endl;
+    cout << i3.iName << "'s stage is " << i3.iStage << endl;
+    cout << i4.iName << "'s stage is " << i4.iStage << endl;
+    cout << i5.iName << "'s stage is " << i5.iStage << endl;
     cout << "\n";
 }
 
 int main(int argc, const char * argv[])
 {
-    bank_account Instruction1( "Instruction_1", "ID" );
-    bank_account Instruction2( "Instruction_2", "IF" );
+    inst Instruction1( "Instruction_1", "$" );
+    inst Instruction2( "Instruction_2", "$" );
+    inst Instruction3( "Instruction_3", "$" );
+    inst Instruction4( "Instruction_4", "$" );
+    inst Instruction5( "Instruction_5", "$" );
     
-    cout << Instruction1.sName << "'s stage is " << Instruction1.mTitle << endl;
-    cout << Instruction2.sName << "'s stage is " << Instruction2.mTitle << endl;
-    cout << "\n";
+    // Initialize stack that is storing stages.
+    stg_init(&stg_stk);
     
-    thread t1( [&](){ transfer( Instruction1, Instruction2); transfer( Instruction1, Instruction2); } );
-    //thread t2( [&](){ transfer( Account1, Account2); } );
+    
+    thread t1( [&](){ transfer( Instruction1, Instruction2, Instruction3, Instruction4, Instruction5 ); } );
+    //thread t2( [&](){ transfer( Instruction1, Instruction2); } );
     
     t1.join();
     //t2.join();
@@ -66,4 +93,15 @@ int main(int argc, const char * argv[])
     return 0;
     
 }
+
+
+
+
+
+
+
+
+
+
+
 
