@@ -7,12 +7,35 @@
 //
 
 #include <iostream>
+#include <thread>
+#include <string>
+
+using namespace std;
+
+string Reg = {"R1", "R2"};
+
+string Stg = {"IF", "ID"};
+
+void call(string str){
+    cout << str << endl;
+}
+
+void t_i(){
+    call("inst 1");
+}
+
+void t_i1(){
+    call("inst 2");
+}
 
 int main(int argc, const char * argv[])
 {
-
-    // insert code here...
-    std::cout << "Hello, World!\n";
+    string inst1 = &Reg[0];
+    thread thrd_1(t_i);
+    thrd_1.join();
+    thread thrd_2(t_i1);
+    thrd_2.join();
+    
     return 0;
     
 }
