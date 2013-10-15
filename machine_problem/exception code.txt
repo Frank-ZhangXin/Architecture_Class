@@ -1,0 +1,8 @@
+100000000	successfully complete
+
+100100100	quit execution
+
+100000011	length error
+
+100000001	operands error
+

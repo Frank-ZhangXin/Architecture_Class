@@ -1,0 +1,7 @@
+Input               Status
+-----               ------
+1.in                 good    
+2.in                 good
+3.in                 good   
+4.in                 good 
+5.in 				 good
